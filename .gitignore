@@ -6,11 +6,20 @@
 # ============================================================
 
 # --- Dataset & Outputs (never commit large files) ---
-data/raw/
-data/processed/
-data/splits/
-checkpoints/
-outputs/
+# Rule: ignore directory CONTENTS but allow .gitkeep anchor files.
+# Using dir/* (one-level glob) + negation works; dir/ does NOT support negation.
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/splits/*
+!data/splits/.gitkeep
+checkpoints/*
+!checkpoints/.gitkeep
+outputs/figures/*
+!outputs/figures/.gitkeep
+outputs/reports/*
+!outputs/reports/.gitkeep
 
 # --- Python cache ---
 __pycache__/
