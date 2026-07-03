@@ -43,11 +43,11 @@ def parse_args():
     p.add_argument("--batch_size",  type=int,   default=32)
     p.add_argument("--lr",          type=float, default=1e-3)
     p.add_argument("--img_size",    type=int,   default=224)
-    p.add_argument("--num_classes", type=int,   default=4)
+    p.add_argument("--num_classes", type=int,   default=2)
     p.add_argument("--workers",     type=int,   default=4)
     p.add_argument("--patience",    type=int,   default=10)
     p.add_argument("--splits_dir",  type=str,   default="data/splits")
-    p.add_argument("--data_root",   type=str,   default="data/raw/AneRBC")
+    p.add_argument("--data_root",   type=str,   default="data/raw")
     p.add_argument("--resume",      type=str,   default=None, help="Path to checkpoint to resume from")
     p.add_argument("--device",      type=str,   default=None, help="'cpu' or 'cuda' (auto-detect if omitted)")
     return p.parse_args()
@@ -58,7 +58,7 @@ def main():
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    # ── DataLoaders ──────────────────────────────────────────────────────────
+    # -- DataLoaders ----------------------------------------------------------
     splits = Path(args.splits_dir)
     train_loader = get_dataloader(splits / "train.csv", args.data_root, mode="train",
                                   img_size=args.img_size, batch_size=args.batch_size,
@@ -67,7 +67,7 @@ def main():
                                   img_size=args.img_size, batch_size=args.batch_size,
                                   num_workers=args.workers)
 
-    # ── Model ────────────────────────────────────────────────────────────────
+    # -- Model ----------------------------------------------------------------
     if args.model == "custom_cnn":
         model = build_custom_cnn(num_classes=args.num_classes)
     else:
@@ -79,11 +79,11 @@ def main():
         model.load_state_dict(torch.load(args.resume, map_location=device))
         print(f"Resumed from checkpoint: {args.resume}")
 
-    # ── Optimiser & Scheduler ────────────────────────────────────────────────
+    # -- Optimiser & Scheduler ------------------------------------------------
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", patience=5, factor=0.5)
 
-    # ── Train ────────────────────────────────────────────────────────────────
+    # -- Train ----------------------------------------------------------------
     save_path = f"checkpoints/{args.model}_best.pth"
     Path("checkpoints").mkdir(exist_ok=True)
 
@@ -91,7 +91,7 @@ def main():
                     epochs=args.epochs, device=device,
                     save_path=save_path, patience=args.patience)
 
-    print(f"\nTraining complete. Best model saved → {save_path}")
+    print(f"\nTraining complete. Best model saved -> {save_path}")
 
 
 if __name__ == "__main__":

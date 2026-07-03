@@ -33,13 +33,16 @@ from src.evaluation.metrics import get_predictions, compute_metrics
 
 def parse_args():
     p = argparse.ArgumentParser(description="Evaluate AneRBC classifier")
-    p.add_argument("--model",       type=str, required=True)
-    p.add_argument("--checkpoint",  type=str, required=True)
-    p.add_argument("--num_classes", type=int, default=4)
+    p.add_argument("--model",       type=str, required=True,
+                   help="Model name: custom_cnn | resnet18 | resnet50 | efficientnet_b0 | vgg16")
+    p.add_argument("--checkpoint",  type=str, required=True,
+                   help="Path to saved .pth checkpoint")
+    p.add_argument("--num_classes", type=int, default=2,
+                   help="Number of classes (default: 2 for AneRBC healthy/anaemic)")
     p.add_argument("--img_size",    type=int, default=224)
     p.add_argument("--batch_size",  type=int, default=32)
     p.add_argument("--splits_dir",  type=str, default="data/splits")
-    p.add_argument("--data_root",   type=str, default="data/raw/AneRBC")
+    p.add_argument("--data_root",   type=str, default="data/raw")
     p.add_argument("--device",      type=str, default=None)
     return p.parse_args()
 
@@ -52,16 +55,24 @@ def main():
     out_figs   = Path("outputs/figures"); out_figs.mkdir(parents=True, exist_ok=True)
     out_reports = Path("outputs/reports"); out_reports.mkdir(parents=True, exist_ok=True)
 
-    # ── Load class names ─────────────────────────────────────────────────────
+    # -- Load class names from test CSV (no separate class_map.csv needed) ---
     import pandas as pd
-    class_map = pd.read_csv(splits / "class_map.csv")
-    class_names = class_map.sort_values("label")["class_name"].tolist()
+    test_df = pd.read_csv(splits / "test.csv")
+    if "class_name" in test_df.columns:
+        class_names = (
+            test_df[["label", "class_name"]]
+            .drop_duplicates()
+            .sort_values("label")["class_name"]
+            .tolist()
+        )
+    else:
+        class_names = [str(i) for i in range(args.num_classes)]
 
-    # ── DataLoader ───────────────────────────────────────────────────────────
+    # -- DataLoader -----------------------------------------------------------
     test_loader = get_dataloader(splits / "test.csv", args.data_root, mode="test",
                                  img_size=args.img_size, batch_size=args.batch_size)
 
-    # ── Model ────────────────────────────────────────────────────────────────
+    # -- Model ----------------------------------------------------------------
     if args.model == "custom_cnn":
         model = build_custom_cnn(num_classes=args.num_classes)
     else:
@@ -69,7 +80,7 @@ def main():
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)
 
-    # ── Evaluate ─────────────────────────────────────────────────────────────
+    # -- Evaluate -------------------------------------------------------------
     labels, preds, probs = get_predictions(model, test_loader, device)
     results = compute_metrics(labels, preds, probs, class_names)
 
@@ -78,7 +89,7 @@ def main():
     print("\nClassification Report:")
     print(results["classification_report"])
 
-    # ── Save confusion matrix ─────────────────────────────────────────────────
+    # -- Save confusion matrix -------------------------------------------------
     cm = results["confusion_matrix"]
     fig, ax = plt.subplots(figsize=(8, 6))
     im = ax.imshow(cm, cmap="Blues")
@@ -86,7 +97,7 @@ def main():
     ax.set_xticks(range(len(class_names))); ax.set_xticklabels(class_names, rotation=45, ha="right")
     ax.set_yticks(range(len(class_names))); ax.set_yticklabels(class_names)
     ax.set_xlabel("Predicted"); ax.set_ylabel("True")
-    ax.set_title(f"Confusion Matrix — {args.model}")
+    ax.set_title(f"Confusion Matrix - {args.model}")
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
             ax.text(j, i, str(cm[i, j]), ha="center", va="center",
@@ -94,9 +105,9 @@ def main():
     plt.tight_layout()
     cm_path = out_figs / f"confusion_matrix_{args.model}.png"
     plt.savefig(cm_path, dpi=150); plt.close()
-    print(f"Confusion matrix saved → {cm_path}")
+    print(f"Confusion matrix saved -> {cm_path}")
 
-    # ── Save report JSON ─────────────────────────────────────────────────────
+    # -- Save report JSON -----------------------------------------------------
     report_path = out_reports / f"metrics_{args.model}.json"
     with open(report_path, "w") as f:
         json.dump({
@@ -105,7 +116,7 @@ def main():
             "roc_auc":  results["roc_auc"],
             "classification_report": results["classification_report"],
         }, f, indent=2)
-    print(f"Metrics report saved → {report_path}")
+    print(f"Metrics report saved -> {report_path}")
 
 
 if __name__ == "__main__":

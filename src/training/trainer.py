@@ -98,7 +98,7 @@ def train(model, train_loader, val_loader, optimizer, scheduler=None,
             best_val_acc = vl_acc
             no_improve   = 0
             torch.save(model.state_dict(), save_path)
-            print(f"  ✓ Saved best model → {save_path}")
+            print(f"  [BEST] Saved best model -> {save_path}")
         else:
             no_improve += 1
             if no_improve >= patience:
