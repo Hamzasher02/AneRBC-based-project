@@ -1,0 +1,29 @@
+# ============================================================
+# Author : Hamza Sher
+# SRN    : 3012260007
+# Project: Medical Image Classification with Custom CNNs,
+#          Transfer Learning, and XAI
+# ============================================================
+
+# Core deep learning
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Data handling
+numpy>=1.24.0
+pandas>=2.0.0
+pillow>=9.5.0
+opencv-python>=4.7.0
+
+# Evaluation & ML utilities
+scikit-learn>=1.2.0
+
+# Visualisation
+matplotlib>=3.7.0
+
+# Explainability (XAI)
+captum>=0.6.0
+
+# Progress & notebooks
+tqdm>=4.65.0
+jupyter>=1.0.0

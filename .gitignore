@@ -1,0 +1,45 @@
+# ============================================================
+# Author : Hamza Sher
+# SRN    : 3012260007
+# Project: Medical Image Classification with Custom CNNs,
+#          Transfer Learning, and XAI
+# ============================================================
+
+# --- Dataset & Outputs (never commit large files) ---
+data/raw/
+data/processed/
+data/splits/
+checkpoints/
+outputs/
+
+# --- Python cache ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# --- Virtual environments ---
+venv/
+env/
+.venv/
+.env/
+ENV/
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+
+# --- Logs & temp ---
+*.log
+*.tmp
+*.bak
