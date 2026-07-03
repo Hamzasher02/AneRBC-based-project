@@ -168,6 +168,34 @@ The script performs validation checks (verifying images with `PIL.Image.open().v
 
 ---
 
+## Task 1.3 -- Dataset Preprocessing
+
+### Run Preprocessing & Cleaning Pipeline
+
+Run the preprocessing script to load, convert to RGB, and resize all images from `data/raw/` to a uniform 224x224 dimension, saving results under `data/processed/`:
+
+```bash
+# Standard resizing and RGB conversion
+venv\Scripts\python scripts/preprocess_data.py --overwrite
+
+# Enhanced preprocessing (with optional CLAHE contrast enhancement and Gaussian denoising)
+venv\Scripts\python scripts/preprocess_data.py --use-clahe --use-denoise --overwrite
+```
+
+### Generated Local Artifacts
+
+* **Processed Dataset**: `data/processed/healthy/` and `data/processed/anaemic/` (JPEG representations of the resized and cleaned images)
+* **Detailed CSV Log**: `outputs/reports/preprocessing_report.csv` (contains input/output file paths and status for every processed file)
+* **Summary JSON Stats**: `outputs/reports/preprocessing_summary.json` (contains runtime config, total count, processed/skipped counts, and class distributions)
+
+### Normalization Notes
+
+* **No Float Images**: PyTorch float tensor normalizations (e.g. ImageNet standard subtraction and division) are **not** written as image files.
+* **Online Transforms**: Subtraction of ImageNet mean (`[0.485, 0.456, 0.406]`) and division by standard deviation (`[0.229, 0.224, 0.225]`) are performed **online** in PyTorch dataset transforms during training/inference.
+* **Git Excluded**: The `data/processed/` outputs are excluded from version control in `.gitignore`.
+
+---
+
 ## Training Commands
 
 ### Train a Custom CNN from Scratch
