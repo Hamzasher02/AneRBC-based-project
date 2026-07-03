@@ -10,6 +10,8 @@
 # Using dir/* (one-level glob) + negation works; dir/ does NOT support negation.
 data/raw/*
 !data/raw/.gitkeep
+data/raw_downloads/*
+!data/raw_downloads/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
 data/splits/*

@@ -74,25 +74,78 @@ pip install -r requirements.txt
 
 ---
 
-## Dataset Instructions
+## Task 1.1 -- Dataset Preparation
 
-1. Download the **AneRBC** dataset from Kaggle or the official source:
-   - Kaggle: [AneRBC Dataset](https://www.kaggle.com/datasets/...)
-2. Place the raw files inside `data/raw/`:
-   ```
-   data/raw/
-   └── AneRBC/
-       ├── class_1/
-       ├── class_2/
-       └── ...
-   ```
-3. Run preprocessing to generate splits:
+### Dataset: AneRBC (Anaemia Red Blood Cell Classification)
+
+The AneRBC dataset consists of microscopic blood-smear images categorised by
+RBC morphology. It must be **downloaded manually**.
+
+> Full dataset documentation: [data/README_DATA.md](data/README_DATA.md)
+
+### Sources
+
+| Source | URL | Account needed? |
+|---|---|---|
+| **Figshare** (recommended) | https://figshare.com/ -- search "AneRBC" | No |
+| Kaggle (alternative) | https://www.kaggle.com/datasets/jocelyndumlao/anerbc-anemia-diagnosis-using-rbc-images | Yes |
+
+### Step 1 -- Download
+
+**Recommended -- Figshare (no account required):**
+
+Visit https://figshare.com/ and search for **AneRBC** or **Anaemia Red Blood Cell**.
+Download the archive directly.
+
+**Alternative -- Kaggle CLI** (requires `kaggle.json` token at `~/.kaggle/`):
 
 ```bash
-python scripts/prepare_data.py
+kaggle datasets download \
+    -d jocelyndumlao/anerbc-anemia-diagnosis-using-rbc-images \
+    -p data/raw_downloads --unzip
 ```
 
-> **Note:** `data/raw/` and `data/processed/` are excluded from git via `.gitignore`.
+### Step 2 -- Arrange Class Folders
+
+After extracting, place each RBC class in its own direct sub-folder inside `data/raw/`:
+
+```
+data/raw/
+  healthy/
+    image001.jpg
+    image002.jpg
+  anaemic/
+    image001.jpg
+    ...
+```
+
+> Folder names must match the actual class names in your downloaded archive.
+> Common AneRBC names: `healthy`, `anaemic`.
+> Adjust if the archive uses different names (e.g. `normal`, `sickle`).
+
+### Step 3 -- Verify Placement
+
+```bash
+python scripts/download_data.py
+```
+
+This script will print:
+- Total class folders found
+- Class folder names and image counts per class
+- A warning if `data/raw/` is empty or missing
+- Next-step instructions on success
+
+### Git Tracking Note
+
+`data/raw/` contents are **excluded from git** via `.gitignore`:
+
+```gitignore
+data/raw/*
+!data/raw/.gitkeep    (only the anchor file is tracked)
+```
+
+**Never commit raw image files.** Only `.gitkeep`, scripts, and documentation
+are tracked in version control.
 
 ---
 
