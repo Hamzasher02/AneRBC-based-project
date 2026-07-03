@@ -63,8 +63,11 @@ def compute_metrics(labels, preds, probs, class_names=None):
     cr   = classification_report(labels, preds, target_names=class_names, digits=4)
 
     try:
-        auc = roc_auc_score(labels, probs, multi_class="ovr", average="macro")
-    except ValueError:
+        if len(probs.shape) == 2 and probs.shape[1] == 2:
+            auc = roc_auc_score(labels, probs[:, 1])
+        else:
+            auc = roc_auc_score(labels, probs, multi_class="ovr", average="macro")
+    except Exception:
         auc = float("nan")
 
     return {
