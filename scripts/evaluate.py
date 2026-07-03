@@ -42,7 +42,7 @@ def parse_args():
     p.add_argument("--img_size",    type=int, default=224)
     p.add_argument("--batch_size",  type=int, default=32)
     p.add_argument("--splits_dir",  type=str, default="data/splits")
-    p.add_argument("--data_root",   type=str, default="data/raw")
+    p.add_argument("--data_root",   type=str, default="data/processed")
     p.add_argument("--device",      type=str, default=None)
     return p.parse_args()
 

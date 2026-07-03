@@ -47,7 +47,7 @@ def parse_args():
     p.add_argument("--workers",     type=int,   default=4)
     p.add_argument("--patience",    type=int,   default=10)
     p.add_argument("--splits_dir",  type=str,   default="data/splits")
-    p.add_argument("--data_root",   type=str,   default="data/raw")
+    p.add_argument("--data_root",   type=str,   default="data/processed")
     p.add_argument("--resume",      type=str,   default=None, help="Path to checkpoint to resume from")
     p.add_argument("--device",      type=str,   default=None, help="'cpu' or 'cuda' (auto-detect if omitted)")
     return p.parse_args()
