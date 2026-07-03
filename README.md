@@ -149,6 +149,25 @@ are tracked in version control.
 
 ---
 
+## Task 1.2 -- Dataset Validation
+
+### Run Dataset Validation checks
+
+Run the validation script to scan all files inside `data/raw/` for image corruption, incorrect class label mappings, invalid file extensions, and class imbalance:
+
+```bash
+venv\Scripts\python scripts/validate_data.py
+```
+
+### Generated Artifacts
+
+The script performs validation checks (verifying images with `PIL.Image.open().verify()` and loading the data) and saves the following marking evidence:
+* **Detailed CSV Log**: `outputs/reports/data_validation_report.csv` (contains width, height, format mode, status, and error messages for every scanned file)
+* **Summary JSON Stats**: `outputs/reports/data_validation_summary.json` (contains class mapping, class counts, corrupted counts, and overall pass status)
+* **Class Distribution Plot**: `outputs/figures/class_distribution.png` (bar chart representing valid image counts per class)
+
+---
+
 ## Training Commands
 
 ### Train a Custom CNN from Scratch
