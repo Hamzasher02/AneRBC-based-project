@@ -257,6 +257,49 @@ Each custom CNN model was trained and validated on the preprocessed dataset `dat
 
 ---
 
+## Task 2.3 -- Custom CNN Model Evaluation
+
+Each custom CNN model was evaluated on the independent test split using the saved best checkpoints.
+
+### Test Results Summary
+
+| Model Name | Test Accuracy | Precision (Macro) | Recall (Macro) | F1-Score (Macro) | ROC-AUC | Support |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| `custom_cnn_3` | 59.33% | 0.5984 | 0.5933 | 0.5880 | 0.6315 | 150 |
+| `custom_cnn_4` | **66.67%** | **0.6769** | **0.6667** | **0.6618** | **0.6967** | 150 |
+| `custom_cnn_5` | 62.67% | 0.6267 | 0.6267 | 0.6267 | 0.6873 | 150 |
+
+**Best Custom CNN Model**: `custom_cnn_4` (4-layer CNN). It achieves the highest macro F1-score (0.6618) and highest overall test accuracy (66.67%) on the test set.
+
+### Evaluation Commands (CPU/GPU-friendly)
+
+To evaluate the custom models on the preprocessed test set:
+```bash
+# Evaluate Custom 3-Layer CNN
+venv\Scripts\python scripts\evaluate.py --model custom_cnn_3 --checkpoint checkpoints/custom_cnn_3_best.pth --workers 0
+
+# Evaluate Custom 4-Layer CNN
+venv\Scripts\python scripts\evaluate.py --model custom_cnn_4 --checkpoint checkpoints/custom_cnn_4_best.pth --workers 0
+
+# Evaluate Custom 5-Layer CNN
+venv\Scripts\python scripts\evaluate.py --model custom_cnn_5 --checkpoint checkpoints/custom_cnn_5_best.pth --workers 0
+```
+
+### Local Artifacts Generated (Git-Ignored)
+
+* **Classification Reports**:
+  * `outputs/reports/classification_report_custom_cnn_3.txt`
+  * `outputs/reports/classification_report_custom_cnn_4.txt`
+  * `outputs/reports/classification_report_custom_cnn_5.txt`
+* **Confusion Matrices**:
+  * `outputs/figures/confusion_matrix_custom_cnn_3.png`
+  * `outputs/figures/confusion_matrix_custom_cnn_4.png`
+  * `outputs/figures/confusion_matrix_custom_cnn_5.png`
+* **Test summary**:
+  * `outputs/reports/custom_cnn_test_summary.csv`
+
+---
+
 ## Training Commands
 
 ### Train a Custom CNN from Scratch

@@ -44,7 +44,43 @@ def parse_args():
     p.add_argument("--splits_dir",  type=str, default="data/splits")
     p.add_argument("--data_root",   type=str, default="data/processed")
     p.add_argument("--device",      type=str, default=None)
+    p.add_argument("--workers",     type=int, default=0)
     return p.parse_args()
+
+
+def update_test_summary_csv(model_name, checkpoint_path, results, reports_dir, cm_path, metrics_path):
+    """
+    Create or update the custom_cnn_test_summary.csv file with evaluation metrics.
+    """
+    import pandas as pd
+    csv_path = Path(reports_dir) / "custom_cnn_test_summary.csv"
+    
+    new_row = {
+        "model_name": model_name,
+        "checkpoint": str(checkpoint_path),
+        "test_accuracy": float(results["accuracy"]),
+        "precision_macro": float(results["precision_macro"]),
+        "recall_macro": float(results["recall_macro"]),
+        "f1_macro": float(results["f1_macro"]),
+        "roc_auc": float(results["roc_auc"]),
+        "support": int(results["support"]),
+        "confusion_matrix_path": str(cm_path),
+        "metrics_json_path": str(metrics_path)
+    }
+    
+    if csv_path.exists():
+        df = pd.read_csv(csv_path)
+    else:
+        df = pd.DataFrame(columns=new_row.keys())
+        
+    if model_name in df["model_name"].values:
+        for k, v in new_row.items():
+            df.loc[df["model_name"] == model_name, k] = v
+    else:
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+        
+    df.to_csv(csv_path, index=False)
+    print(f"Updated test summary -> {csv_path}")
 
 
 def main():
@@ -70,7 +106,8 @@ def main():
 
     # -- DataLoader -----------------------------------------------------------
     test_loader = get_dataloader(splits / "test.csv", args.data_root, mode="test",
-                                 img_size=args.img_size, batch_size=args.batch_size)
+                                 img_size=args.img_size, batch_size=args.batch_size,
+                                 num_workers=args.workers)
 
     # -- Model ----------------------------------------------------------------
     if args.model in ("custom_cnn_3", "custom_cnn_4", "custom_cnn_5", "custom_cnn"):
@@ -109,14 +146,34 @@ def main():
 
     # -- Save report JSON -----------------------------------------------------
     report_path = out_reports / f"metrics_{args.model}.json"
-    with open(report_path, "w") as f:
+    with open(report_path, "w", encoding="utf-8") as f:
         json.dump({
             "model":    args.model,
             "accuracy": results["accuracy"],
+            "precision_macro": results["precision_macro"],
+            "recall_macro": results["recall_macro"],
+            "f1_macro": results["f1_macro"],
             "roc_auc":  results["roc_auc"],
+            "support":  results["support"],
             "classification_report": results["classification_report"],
         }, f, indent=2)
     print(f"Metrics report saved -> {report_path}")
+
+    # -- Save classification report text --------------------------------------
+    cr_path = out_reports / f"classification_report_{args.model}.txt"
+    with open(cr_path, "w", encoding="utf-8") as f:
+        f.write(results["classification_report"])
+    print(f"Classification report saved -> {cr_path}")
+
+    # -- Update test summary CSV ----------------------------------------------
+    update_test_summary_csv(
+        model_name=args.model,
+        checkpoint_path=args.checkpoint,
+        results=results,
+        reports_dir=out_reports,
+        cm_path=cm_path,
+        metrics_path=report_path
+    )
 
 
 if __name__ == "__main__":

@@ -56,11 +56,15 @@ def compute_metrics(labels, preds, probs, class_names=None):
     Compute a full evaluation report.
 
     Returns a dict containing:
-        accuracy, classification_report, confusion_matrix, roc_auc (OvR macro).
+        accuracy, classification_report, confusion_matrix, roc_auc (OvR macro),
+        precision_macro, recall_macro, f1_macro, support.
     """
+    from sklearn.metrics import precision_recall_fscore_support
     acc  = accuracy_score(labels, preds)
     cm   = confusion_matrix(labels, preds)
     cr   = classification_report(labels, preds, target_names=class_names, digits=4)
+    p_mac, r_mac, f1_mac, _ = precision_recall_fscore_support(labels, preds, average="macro", zero_division=0)
+    support = len(labels)
 
     try:
         if len(probs.shape) == 2 and probs.shape[1] == 2:
@@ -75,4 +79,8 @@ def compute_metrics(labels, preds, probs, class_names=None):
         "roc_auc":               auc,
         "confusion_matrix":      cm,
         "classification_report": cr,
+        "precision_macro":       float(p_mac),
+        "recall_macro":          float(r_mac),
+        "f1_macro":              float(f1_mac),
+        "support":               int(support)
     }
