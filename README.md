@@ -328,6 +328,37 @@ venv\Scripts\python scripts\train.py --model resnet18 --pretrained --freeze --ep
 
 ---
 
+## Task 3.2 -- Train/Validate Pretrained Models
+
+The three transfer learning models were fine-tuned with a frozen feature extraction backbone and trainable classifier heads on the preprocessed dataset.
+
+### Training Commands Run
+```bash
+# MobileNetV2
+venv\Scripts\python scripts\train.py --model mobilenet_v2 --pretrained --freeze --epochs 20 --batch_size 16 --data_root data/processed --workers 0 --patience 6
+
+# SqueezeNet 1.0
+venv\Scripts\python scripts\train.py --model squeezenet1_0 --pretrained --freeze --epochs 20 --batch_size 16 --data_root data/processed --workers 0 --patience 6
+
+# ResNet18
+venv\Scripts\python scripts\train.py --model resnet18 --pretrained --freeze --epochs 20 --batch_size 16 --data_root data/processed --workers 0 --patience 6
+```
+
+### Pretrained Validation Results Summary
+
+This is saved locally under `outputs/reports/transfer_validation_summary.csv`:
+
+| Model Name | Best Validation Loss | Best Validation Accuracy | Epochs Run | Checkpoint Path | Learning Curve Plot |
+| :--- | :---: | :---: | :---: | :--- | :--- |
+| `mobilenet_v2` | 0.4907 | 78.00% | 8 epochs (early stopped) | `checkpoints/mobilenet_v2_best.pth` | `outputs/figures/learning_curve_mobilenet_v2.png` |
+| `squeezenet1_0` | **0.4085** | **80.67%** | 17 epochs (early stopped) | `checkpoints/squeezenet1_0_best.pth` | `outputs/figures/learning_curve_squeezenet1_0.png` |
+| `resnet18` | 0.5022 | 74.67% | 11 epochs (early stopped) | `checkpoints/resnet18_best.pth` | `outputs/figures/learning_curve_resnet18.png` |
+
+> [!NOTE]
+> For all transfer learning runs, the backbone features were completely frozen (`requires_grad = False`). Only the custom replaced classifier heads were optimized, enabling fast convergence and preventing overfitting on the medical image dataset.
+
+---
+
 ## Training Commands
 
 ### Train a Custom CNN from Scratch

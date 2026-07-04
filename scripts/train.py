@@ -108,7 +108,10 @@ def save_history_and_plots(history, model_name):
             best_idx = i
     best_val_loss = history["val_loss"][best_idx]
     
-    csv_path = reports_dir / "custom_cnn_validation_summary.csv"
+    if any(x in model_name for x in ["resnet", "mobilenet", "squeezenet", "vgg", "efficientnet"]):
+        csv_path = reports_dir / "transfer_validation_summary.csv"
+    else:
+        csv_path = reports_dir / "custom_cnn_validation_summary.csv"
     if csv_path.exists():
         df = pd.read_csv(csv_path)
     else:
