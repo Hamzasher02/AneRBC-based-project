@@ -29,14 +29,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.data.dataset import get_dataloader
 from src.models.custom_cnn import build_custom_model
-from src.models.transfer_model import build_transfer_model
+from src.models.transfer_model import build_transfer_model, get_trainable_parameter_summary
 from src.training.trainer import train
 
 
 def parse_args():
     p = argparse.ArgumentParser(description="Train AneRBC classifier")
     p.add_argument("--model",       type=str,   default="custom_cnn",
-                   help="Model: 'custom_cnn_3' | 'custom_cnn_4' | 'custom_cnn_5' | 'custom_cnn' | 'resnet18' | 'resnet50' | 'efficientnet_b0' | 'vgg16'")
+                   help="Model: 'custom_cnn_3' | 'custom_cnn_4' | 'custom_cnn_5' | 'custom_cnn' | 'resnet18' | 'resnet50' | 'efficientnet_b0' | 'vgg16' | 'mobilenet_v2' | 'squeezenet1_0'")
     p.add_argument("--pretrained",  action="store_true", help="Use ImageNet weights (transfer only)")
     p.add_argument("--freeze",      action="store_true", help="Freeze backbone features")
     p.add_argument("--epochs",      type=int,   default=50)
@@ -143,8 +143,16 @@ def main():
     if args.model in ("custom_cnn_3", "custom_cnn_4", "custom_cnn_5", "custom_cnn"):
         model = build_custom_model(args.model, num_classes=args.num_classes)
     else:
-        model = build_transfer_model(backbone=args.model, num_classes=args.num_classes,
-                                     pretrained=args.pretrained, freeze_features=args.freeze)
+        model = build_transfer_model(model_name=args.model, num_classes=args.num_classes,
+                                     pretrained=args.pretrained, freeze_backbone=args.freeze)
+        if args.pretrained:
+            summary = get_trainable_parameter_summary(model)
+            print(f"\n--- {args.model} Parameter Summary ---")
+            print(f"Total parameters      : {summary['total_params']:,}")
+            print(f"Trainable parameters  : {summary['trainable_params']:,}")
+            print(f"Frozen parameters     : {summary['frozen_params']:,}")
+            print(f"Trainable layers count: {len(summary['trainable_layer_names'])}")
+            print(f"Trainable layers      : {summary['trainable_layer_names']}\n")
     model = model.to(device)
 
     if args.resume:

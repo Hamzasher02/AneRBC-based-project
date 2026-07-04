@@ -300,6 +300,34 @@ venv\Scripts\python scripts\evaluate.py --model custom_cnn_5 --checkpoint checkp
 
 ---
 
+## Task 3.1 -- Transfer Learning Architecture Support
+
+Support for three pretrained CNN models as feature extractors with frozen convolutional backbones and customized classifier heads.
+
+### Pretrained Models Specifications
+
+| Pretrained Model | PyTorch backbone name | Replaced Classifier Head | Freeze Backbone Explanation | Trainable Top Layers Explanation |
+| :--- | :--- | :--- | :--- | :--- |
+| **MobileNetV2** | `mobilenet_v2` | `classifier[1]` (Linear) | Set all convolutional/inverted residual block parameters `requires_grad = False`. | The final `nn.Linear` classifier head is trained for 2 classes. |
+| **SqueezeNet 1.0** | `squeezenet1_0` | `classifier[1]` (Conv2d) + `num_classes` | Set all fire block and squeeze parameters `requires_grad = False`. | The classifier Conv2d layer is trained for 2 classes. |
+| **ResNet18** | `resnet18` | `fc` (Linear) | Set all residual block parameters `requires_grad = False`. | The final fully-connected Linear layer is trained for 2 classes. |
+
+### Training Example Commands (CPU/GPU-friendly)
+
+To train these models with a frozen backbone:
+```bash
+# Train MobileNetV2 Transfer Learning Model
+venv\Scripts\python scripts\train.py --model mobilenet_v2 --pretrained --freeze --epochs 20 --batch_size 16 --workers 0
+
+# Train SqueezeNet 1.0 Transfer Learning Model
+venv\Scripts\python scripts\train.py --model squeezenet1_0 --pretrained --freeze --epochs 20 --batch_size 16 --workers 0
+
+# Train ResNet18 Transfer Learning Model
+venv\Scripts\python scripts\train.py --model resnet18 --pretrained --freeze --epochs 20 --batch_size 16 --workers 0
+```
+
+---
+
 ## Training Commands
 
 ### Train a Custom CNN from Scratch

@@ -34,7 +34,7 @@ from src.evaluation.metrics import get_predictions, compute_metrics
 def parse_args():
     p = argparse.ArgumentParser(description="Evaluate AneRBC classifier")
     p.add_argument("--model",       type=str, required=True,
-                   help="Model name: custom_cnn_3 | custom_cnn_4 | custom_cnn_5 | custom_cnn | resnet18 | resnet50 | efficientnet_b0 | vgg16")
+                   help="Model name: custom_cnn_3 | custom_cnn_4 | custom_cnn_5 | custom_cnn | resnet18 | resnet50 | efficientnet_b0 | vgg16 | mobilenet_v2 | squeezenet1_0")
     p.add_argument("--checkpoint",  type=str, required=True,
                    help="Path to saved .pth checkpoint")
     p.add_argument("--num_classes", type=int, default=2,
@@ -113,7 +113,7 @@ def main():
     if args.model in ("custom_cnn_3", "custom_cnn_4", "custom_cnn_5", "custom_cnn"):
         model = build_custom_model(args.model, num_classes=args.num_classes)
     else:
-        model = build_transfer_model(backbone=args.model, num_classes=args.num_classes, pretrained=False)
+        model = build_transfer_model(model_name=args.model, num_classes=args.num_classes, pretrained=False)
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)
 
