@@ -48,12 +48,15 @@ def parse_args():
     return p.parse_args()
 
 
-def update_test_summary_csv(model_name, checkpoint_path, results, reports_dir, cm_path, metrics_path):
+def update_test_summary_csv(model_name, checkpoint_path, results, reports_dir, cm_path, metrics_path, cr_path):
     """
-    Create or update the custom_cnn_test_summary.csv file with evaluation metrics.
+    Create or update the test summary CSV file with evaluation metrics.
     """
     import pandas as pd
-    csv_path = Path(reports_dir) / "custom_cnn_test_summary.csv"
+    if any(x in model_name for x in ["resnet", "mobilenet", "squeezenet", "vgg", "efficientnet"]):
+        csv_path = Path(reports_dir) / "transfer_test_summary.csv"
+    else:
+        csv_path = Path(reports_dir) / "custom_cnn_test_summary.csv"
     
     new_row = {
         "model_name": model_name,
@@ -65,7 +68,8 @@ def update_test_summary_csv(model_name, checkpoint_path, results, reports_dir, c
         "roc_auc": float(results["roc_auc"]),
         "support": int(results["support"]),
         "confusion_matrix_path": str(cm_path),
-        "metrics_json_path": str(metrics_path)
+        "metrics_json_path": str(metrics_path),
+        "classification_report_path": str(cr_path)
     }
     
     if csv_path.exists():
@@ -172,7 +176,8 @@ def main():
         results=results,
         reports_dir=out_reports,
         cm_path=cm_path,
-        metrics_path=report_path
+        metrics_path=report_path,
+        cr_path=cr_path
     )
 
 

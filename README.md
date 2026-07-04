@@ -359,6 +359,37 @@ This is saved locally under `outputs/reports/transfer_validation_summary.csv`:
 
 ---
 
+## Task 3.3 -- Test/Evaluate Pretrained Models
+
+The three trained pretrained models were evaluated on the independent test set (150 images total, stratified split).
+
+### Evaluation Commands Run
+```bash
+# MobileNetV2
+venv\Scripts\python scripts\evaluate.py --model mobilenet_v2 --checkpoint checkpoints/mobilenet_v2_best.pth --data_root data/processed --batch_size 16 --workers 0
+
+# SqueezeNet 1.0
+venv\Scripts\python scripts\evaluate.py --model squeezenet1_0 --checkpoint checkpoints/squeezenet1_0_best.pth --data_root data/processed --batch_size 16 --workers 0
+
+# ResNet18
+venv\Scripts\python scripts\evaluate.py --model resnet18 --checkpoint checkpoints/resnet18_best.pth --data_root data/processed --batch_size 16 --workers 0
+```
+
+### Pretrained Test Results Summary
+
+This is saved locally under `outputs/reports/transfer_test_summary.csv`:
+
+| Model Name | Test Accuracy | Precision (Macro) | Recall (Macro) | F1-Score (Macro) | ROC-AUC | Support | Confusion Matrix | Classification Report |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- | :--- |
+| `mobilenet_v2` | **75.33%** | **0.7707** | **0.7533** | **0.7493** | 0.8228 | 150 | `outputs/figures/confusion_matrix_mobilenet_v2.png` | `outputs/reports/classification_report_mobilenet_v2.txt` |
+| `squeezenet1_0` | 74.00% | 0.7421 | 0.7400 | 0.7394 | **0.8455** | 150 | `outputs/figures/confusion_matrix_squeezenet1_0.png` | `outputs/reports/classification_report_squeezenet1_0.txt` |
+| `resnet18` | 70.00% | 0.7083 | 0.7000 | 0.6970 | 0.8084 | 150 | `outputs/figures/confusion_matrix_resnet18.png` | `outputs/reports/classification_report_resnet18.txt` |
+
+* **Best Pretrained Model**: `mobilenet_v2`
+* **Reason**: Achieved the highest macro F1-score (**0.7493**) and highest overall test accuracy (**75.33%**) on the test set.
+
+---
+
 ## Training Commands
 
 ### Train a Custom CNN from Scratch
