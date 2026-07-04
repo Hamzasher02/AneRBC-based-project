@@ -53,6 +53,78 @@ def parse_args():
     return p.parse_args()
 
 
+def save_history_and_plots(history, model_name):
+    """
+    Save the training history to JSON, plot the learning curves, and update the
+    validation summary CSV file.
+    """
+    import json
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    
+    reports_dir = Path("outputs/reports")
+    figures_dir = Path("outputs/figures")
+    reports_dir.mkdir(exist_ok=True, parents=True)
+    figures_dir.mkdir(exist_ok=True, parents=True)
+    
+    # 1. Save history JSON
+    history_path = reports_dir / f"history_{model_name}.json"
+    with open(history_path, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=4)
+    print(f"Saved history -> {history_path}")
+    
+    # 2. Save learning curve PNG
+    epochs = range(1, len(history["train_loss"]) + 1)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    ax1.plot(epochs, history["train_loss"], label="Train Loss")
+    ax1.plot(epochs, history["val_loss"], label="Val Loss")
+    ax1.set_title(f"Loss Curves - {model_name}")
+    ax1.set_xlabel("Epochs")
+    ax1.set_ylabel("Loss")
+    ax1.legend()
+    ax1.grid(True)
+    
+    ax2.plot(epochs, history["train_acc"], label="Train Acc")
+    ax2.plot(epochs, history["val_acc"], label="Val Acc")
+    ax2.set_title(f"Accuracy Curves - {model_name}")
+    ax2.set_xlabel("Epochs")
+    ax2.set_ylabel("Accuracy")
+    ax2.legend()
+    ax2.grid(True)
+    
+    plt.tight_layout()
+    curve_path = figures_dir / f"learning_curve_{model_name}.png"
+    plt.savefig(curve_path, dpi=150)
+    plt.close()
+    print(f"Saved learning curve -> {curve_path}")
+    
+    # 3. Update validation summary CSV
+    best_idx = 0
+    best_val_acc = 0.0
+    for i, acc in enumerate(history["val_acc"]):
+        if acc > best_val_acc:
+            best_val_acc = acc
+            best_idx = i
+    best_val_loss = history["val_loss"][best_idx]
+    
+    csv_path = reports_dir / "custom_cnn_validation_summary.csv"
+    if csv_path.exists():
+        df = pd.read_csv(csv_path)
+    else:
+        df = pd.DataFrame(columns=["model_name", "best_val_loss", "best_val_acc"])
+        
+    if model_name in df["model_name"].values:
+        df.loc[df["model_name"] == model_name, "best_val_loss"] = best_val_loss
+        df.loc[df["model_name"] == model_name, "best_val_acc"] = best_val_acc
+    else:
+        new_row = pd.DataFrame([{"model_name": model_name, "best_val_loss": best_val_loss, "best_val_acc": best_val_acc}])
+        df = pd.concat([df, new_row], ignore_index=True)
+        
+    df.to_csv(csv_path, index=False)
+    print(f"Updated validation summary -> {csv_path}")
+
+
 def main():
     args   = parse_args()
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -92,6 +164,9 @@ def main():
                     save_path=save_path, patience=args.patience)
 
     print(f"\nTraining complete. Best model saved -> {save_path}")
+
+    # Save training evidence (Task 2.2)
+    save_history_and_plots(history, args.model)
 
 
 if __name__ == "__main__":

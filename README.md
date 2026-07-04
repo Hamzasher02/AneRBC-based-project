@@ -226,6 +226,37 @@ venv\Scripts\python scripts\train.py --model custom_cnn_5 --epochs 30
 
 ---
 
+## Task 2.2 -- Custom CNN Model Training & Validation
+
+Each custom CNN model was trained and validated on the preprocessed dataset `data/processed/` using early stopping (patience = 8 epochs).
+
+### Validation Results Summary
+
+| Model Name | Best Validation Loss | Best Validation Accuracy | Epochs Trained |
+| :--- | :---: | :---: | :---: |
+| `custom_cnn_3` | 0.5860 | 75.33% | 11 (Early stopped) |
+| `custom_cnn_4` | 0.4998 | 78.00% | 20 (Early stopped) |
+| `custom_cnn_5` | 0.5466 | 74.00% | 15 (Early stopped) |
+
+### Local Artifacts Generated (Git-Ignored)
+
+* **Checkpoints**:
+  * `checkpoints/custom_cnn_3_best.pth`
+  * `checkpoints/custom_cnn_4_best.pth`
+  * `checkpoints/custom_cnn_5_best.pth`
+* **History Logs**:
+  * `outputs/reports/history_custom_cnn_3.json`
+  * `outputs/reports/history_custom_cnn_4.json`
+  * `outputs/reports/history_custom_cnn_5.json`
+* **Learning Curves**:
+  * `outputs/figures/learning_curve_custom_cnn_3.png`
+  * `outputs/figures/learning_curve_custom_cnn_4.png`
+  * `outputs/figures/learning_curve_custom_cnn_5.png`
+* **Validation summary**:
+  * `outputs/reports/custom_cnn_validation_summary.csv`
+
+---
+
 ## Training Commands
 
 ### Train a Custom CNN from Scratch
