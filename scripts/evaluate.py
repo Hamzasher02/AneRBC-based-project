@@ -26,7 +26,7 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.data.dataset import get_dataloader
-from src.models.custom_cnn import build_custom_cnn
+from src.models.custom_cnn import build_custom_model
 from src.models.transfer_model import build_transfer_model
 from src.evaluation.metrics import get_predictions, compute_metrics
 
@@ -34,7 +34,7 @@ from src.evaluation.metrics import get_predictions, compute_metrics
 def parse_args():
     p = argparse.ArgumentParser(description="Evaluate AneRBC classifier")
     p.add_argument("--model",       type=str, required=True,
-                   help="Model name: custom_cnn | resnet18 | resnet50 | efficientnet_b0 | vgg16")
+                   help="Model name: custom_cnn_3 | custom_cnn_4 | custom_cnn_5 | custom_cnn | resnet18 | resnet50 | efficientnet_b0 | vgg16")
     p.add_argument("--checkpoint",  type=str, required=True,
                    help="Path to saved .pth checkpoint")
     p.add_argument("--num_classes", type=int, default=2,
@@ -73,8 +73,8 @@ def main():
                                  img_size=args.img_size, batch_size=args.batch_size)
 
     # -- Model ----------------------------------------------------------------
-    if args.model == "custom_cnn":
-        model = build_custom_cnn(num_classes=args.num_classes)
+    if args.model in ("custom_cnn_3", "custom_cnn_4", "custom_cnn_5", "custom_cnn"):
+        model = build_custom_model(args.model, num_classes=args.num_classes)
     else:
         model = build_transfer_model(backbone=args.model, num_classes=args.num_classes, pretrained=False)
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))

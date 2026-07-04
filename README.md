@@ -198,6 +198,34 @@ venv\Scripts\python scripts/preprocess_data.py --use-clahe --use-denoise --overw
 
 ---
 
+## Task 2.1 -- Custom CNN Architectures
+
+Custom deep convolutional neural network architectures with 3, 4, and 5 layers. Features include Convolution blocks (Conv, BatchNorm, ReLU), MaxPooling, Dropout, and fully-connected classifiers.
+
+### Architecture Specifications
+
+| Model Name | Conv Layers | Filters | Activation | Dropout | Classifier Neurons |
+| :--- | :---: | :--- | :---: | :---: | :--- |
+| `custom_cnn_3` | 3 | 32, 64, 128 | ReLU | 0.25 | 128 -> 256 -> `num_classes` |
+| `custom_cnn_4` | 4 | 32, 64, 128, 256 | ReLU | 0.30 | 256 -> 512 -> `num_classes` |
+| `custom_cnn_5` | 5 | 32, 64, 128, 256, 512 | ReLU | 0.40 | 512 -> 512 -> 256 -> `num_classes` |
+
+### Training Example Commands (CPU/GPU-friendly)
+
+To train the custom models:
+```bash
+# Train Custom 3-Layer CNN
+venv\Scripts\python scripts\train.py --model custom_cnn_3 --epochs 30
+
+# Train Custom 4-Layer CNN (equivalent to default custom_cnn)
+venv\Scripts\python scripts\train.py --model custom_cnn_4 --epochs 30
+
+# Train Custom 5-Layer CNN
+venv\Scripts\python scripts\train.py --model custom_cnn_5 --epochs 30
+```
+
+---
+
 ## Training Commands
 
 ### Train a Custom CNN from Scratch

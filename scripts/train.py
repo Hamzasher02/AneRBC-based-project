@@ -28,7 +28,7 @@ import torch.optim as optim
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.data.dataset import get_dataloader
-from src.models.custom_cnn import build_custom_cnn
+from src.models.custom_cnn import build_custom_model
 from src.models.transfer_model import build_transfer_model
 from src.training.trainer import train
 
@@ -36,7 +36,7 @@ from src.training.trainer import train
 def parse_args():
     p = argparse.ArgumentParser(description="Train AneRBC classifier")
     p.add_argument("--model",       type=str,   default="custom_cnn",
-                   help="Model: 'custom_cnn' | 'resnet18' | 'resnet50' | 'efficientnet_b0' | 'vgg16'")
+                   help="Model: 'custom_cnn_3' | 'custom_cnn_4' | 'custom_cnn_5' | 'custom_cnn' | 'resnet18' | 'resnet50' | 'efficientnet_b0' | 'vgg16'")
     p.add_argument("--pretrained",  action="store_true", help="Use ImageNet weights (transfer only)")
     p.add_argument("--freeze",      action="store_true", help="Freeze backbone features")
     p.add_argument("--epochs",      type=int,   default=50)
@@ -68,8 +68,8 @@ def main():
                                   num_workers=args.workers)
 
     # -- Model ----------------------------------------------------------------
-    if args.model == "custom_cnn":
-        model = build_custom_cnn(num_classes=args.num_classes)
+    if args.model in ("custom_cnn_3", "custom_cnn_4", "custom_cnn_5", "custom_cnn"):
+        model = build_custom_model(args.model, num_classes=args.num_classes)
     else:
         model = build_transfer_model(backbone=args.model, num_classes=args.num_classes,
                                      pretrained=args.pretrained, freeze_features=args.freeze)
